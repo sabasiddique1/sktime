@@ -126,6 +126,10 @@ class BaseDeepClassifierPytorch(BaseClassifier):
         self._all_callbacks = None
 
     def _fit(self, X, y):
+        if self.random_state is not None:
+            torchManual_seed = _safe_import("torch.manual_seed")
+            torchManual_seed(self.random_state)
+
         y = self._encode_y(y)
 
         self.network = self._build_network(X, y)
@@ -432,7 +436,7 @@ class BaseDeepClassifierPytorch(BaseClassifier):
                 optimizer_class = _safe_import(
                     f"torch.optim.{self._all_optimizers[self.optimizer.lower()]}"
                 )
-                if self.callback_kwargs:
+                if self.optimizer_kwargs:
                     return optimizer_class(
                         self.network.parameters(), lr=self.lr, **self.optimizer_kwargs
                     )
